@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans>
+	
+	<bean id="IncomingComponent" class="processing.cfc.incoming.incoming" />
+	
+	<bean id="UploadComponent" class="processing.cfc.upload.upload" />
+	
+	<!-- communication with master system -->
+	<bean id="Communication" class="processing.cfc.comm.comm" />
+	
+	<!-- queue management -->
+	<bean id="QueueComponent" class="processing.cfc.queue.queue" />
+	
+	<!-- storage (s3) -->
+	<bean id="Storage" class="processing.cfc.storage.storage" />
+	
+	<!-- various reader -->
+	<bean id="MP3Reader" class="processing.cfc.formats.mp3" />
+	<bean id="M4AReader" class="processing.cfc.formats.m4a" />
+	<bean id="WMAReader" class="processing.cfc.formats.wma" />
+	<bean id="OGGReader" class="processing.cfc.formats.ogg" />
+	
+	<!-- remote analysis -->
+	<bean id="RemoteAnalysis" class="processing.cfc.tools.remoteanalysis" />
+	
+	<!-- AudioConverter -->
+	<bean id="AudioConverter" class="processing.cfc.formats.converter" />
+	
+	<!-- tools -->
+	<bean id="Tools" class="processing.cfc.tools.tools" />
+	
+
+</beans>

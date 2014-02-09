@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mach-ii PUBLIC "-//Mach-II//DTD Mach-II Configuration 1.5.0//EN"
+	"http://www.mach-ii.com/dtds/mach-ii_1_5_0.dtd" >
+
+<mach-ii version="1.5">
+	
+	<!-- PROPERTIES -->
+	<properties>
+		<property name="applicationRoot" value="/processing/" />
+		<property name="defaultEvent" value="home" />
+		<property name="eventParameter" value="event" />
+		<property name="parameterPrecedence" value="form" />
+		<property name="maxEvents" value="10" />
+		<property name="exceptionEvent" value="exception" />
+		<!-- location of coldspring properties file -->
+		<property name="ColdSpringPropertyFilename" value="config/coldspring.xml" />
+		
+		<property name="redirectPersistScope" value="application" />
+	</properties>
+
+	<!-- LISTENERS -->
+	<listeners>
+		<listener name="Incoming" type="processing.model.incoming.incoming" />
+		<listener name="Queue" type="processing.model.queue.queue" />
+		<!--
+		<listener name="yourListenerName" type="fully.Qualified.Dot.Delimited.Path.To.CFC">
+			<parameters>
+				<parameter name="yourParameterName" value="yourParameterValue" />
+			</parameters>
+		</listener>
+		-->
+	</listeners>
+	
+	<!-- EVENT-FILTERS -->
+	<event-filters>
+		<!--
+		<event-filter name="yourEventFilterName" type="fully.Qualified.Dot.Delimited.Path.To.CFC">
+			<parameters>
+				<parameter name="yourParameterName" value="yourParameterValue" />
+			</parameters>
+		</event-filter>
+		-->
+	</event-filters>
+
+	<!-- PLUGINS -->
+	<plugins>
+		<plugin name="coldSpringPlugin" type="coldspring.machii.ColdspringPlugin">
+			<parameters>
+			
+				<!-- property name that the beanFactory will be stored in (in the mach-ii property manager)
+					 default: 'beanFactory' -->
+				<parameter name="beanFactoryPropertyName" value="beanFactory"/>
+				
+				<!-- mach-ii property name that holds the path to the coldspring config file 
+					 default: 'ColdSpringComponentsLocation' -->
+				<parameter name="configFilePropertyName" value="ColdSpringPropertyFilename"/>
+				
+				<!-- flag to indicate whether supplied config path is relative or absolute 
+					 default: false (absolute path) -->
+				<parameter name="configFilePathIsRelative" value="true"/>
+				
+				<!-- flag to indicate whether to resolve dependencies for listeners/filters/plugins 
+					 default: false -->
+				<parameter name="resolveMachiiDependencies" value="false"/>
+				
+				<!-- indicate a key to pull in a parent bean factory from the application scope
+					 default: false -->
+				<parameter name="parentBeanFactoryKey" value="serviceFactory"/>
+				
+				<parameter name="placeFactoryInApplicationScope" value="true"/> 
+				
+			</parameters>
+		</plugin>
+	</plugins>
+
+	<!-- EVENT-HANDLERS -->
+	<event-handlers>
+		<event-handler event="home" access="public">
+			<!-- <notify listener="SomeListener" method="doSomething" resultArg="resultOfSomething" />  -->
+			<view-page name="home" />
+		</event-handler>
+		
+		<!--  setup this host -->
+		<event-handler event="setup" access="public">
+			<view-page name="setup" />
+		</event-handler>
+		
+		<!-- uploader -->
+		<event-handler event="upload" access="public">
+			<notify listener="Incoming" method="CheckIncomingRequest" />
+			<view-page name="upload" />
+		</event-handler>		
+	
+		<!--  handle the queue items -->
+		<event-handler event="checkincoming" access="public">
+		    <notify listener="Queue" method="transmitQueueStatus" />
+			<notify listener="Queue" method="CleanupAndModifyQueuePriorities" />
+			<notify listener="Queue" method="GetNextWaitingQueueItems" />
+			<view-page name="checkincoming" />
+		</event-handler>	
+		
+		<!--  upload to S3 -->
+		<event-handler event="upload2s3" access="public">
+			<view-page name="upload2s3" />
+		</event-handler>
+		
+		<!-- kill long-running processes -->
+		<event-handler event="killlongrunningprocesses" access="public">
+			<view-page name="killlongrunningprocesses" />
+		</event-handler>
+		
+		<!--  testing page -->
+		<event-handler event="demo.test" access="public">
+			<view-page name="demo.test" />		
+		</event-handler>
+		
+		<!--  convert files -->
+		<event-handler event="convertfiles" access="public">
+			<view-page name="convertfiles" />
+		</event-handler>
+		
+		<!--  resubmit meta info -->
+		<event-handler event="resubmitmetainfo" access="public">
+			<view-page name="resubmitmetainfo" />
+		</event-handler>
+		
+		<!-- notify - we're done with converting -->
+		<event-handler event="notify.converting.done" access="public">
+			<!--  TODO -->
+			<view-page name="notify.converting.done" />
+		</event-handler>
+			
+		<!--  show queue  -->
+		<event-handler event="dbstatus" access="public">
+			<view-page name="dbstatus" />
+		</event-handler>
+		
+		<!--  cleanup -->
+		<event-handler event="cleanup" access="public">
+			<view-page name="cleanup" />
+		</event-handler>
+		
+		<!--  request a PUID job -->
+		<event-handler event="requestpuidjob" access="public">
+			<view-page name="requestpuidjob" />
+		</event-handler>
+		
+		<!-- request remote analysis job -->
+		<event-handler event="requestremoteanalysisjob" access="public">
+			<view-page name="requestremoteanalysisjob" />
+		</event-handler>
+				
+		<event-handler event="exception" access="private">
+			<view-page name="exception" />
+		</event-handler>
+	</event-handlers>
+	
+	<!-- SUBROUTINES -->
+	<subroutines>
+		<!--
+		<subroutine name="yourSubroutineName">
+		</subroutine>
+		-->
+	</subroutines>
+	
+	<!-- PAGE-VIEWS -->
+	<page-views>
+		
+		<!-- upload -->
+		<page-view name="upload" page="/views/upload/dsp_upload.cfm" />
+		<page-view name="checkincoming" page="/views/jobs/dsp_checkincoming.cfm" />
+		<page-view name="upload2s3" page="/views/jobs/dsp_upload2s3.cfm" />
+		<page-view name="convertfiles" page="/views/jobs/dsp_convertfiles.cfm" />
+		<page-view name="notify.converting.done" page="/views/jobs/dsp_notify.converting.done.cfm" />
+		<page-view name="setup" page="/views/setup.cfm" />
+		<page-view name="resubmitmetainfo" page="/views/jobs/dsp_resubmitmetainfo.cfm" />
+		<page-view name="requestpuidjob" page="/views/jobs/dsp_request_puid_job.cfm" />
+		<page-view name="cleanup" page="/views/jobs/dsp_cleanup.cfm" />
+		<page-view name="killlongrunningprocesses" page="/views/jobs/dsp_kill_longrunning_processes.cfm" />
+		<page-view name="requestremoteanalysisjob" page="/views/jobs/dsp_requestremoteanalysisjob.cfm" />
+		
+		<page-view name="dbstatus" page="/views/dbstatus.cfm" />
+		
+		<!-- testing -->
+		<page-view name="demo.test" page="/views/demo/dsp_demo.test.cfm" />
+		
+		<page-view name="home" page="/views/home.cfm" />
+		<page-view name="exception" page="/views/exception.cfm" />
+	</page-views>
+	
+</mach-ii>
